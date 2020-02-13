@@ -1,0 +1,65 @@
+Organizations:
+
+    - &OrdererOrg
+        Name: OrdererBankingOrg
+
+        ID: OrdererMSP
+
+        MSPDir: crypto-config/ordererOrganizations/banking.com/msp
+
+    - &axisBank
+        Name: axisBank
+        ID: AxisMSP
+
+        MSPDir: crypto-config/peerOrganizations/axis.com/msp
+        
+    - &yesBank
+        Name: yesBank
+      
+        ID: YesMSP
+      
+        MSPDir: crypto-config/peerOrganizations/yes.com/msp
+
+Orderer: &OrdererDefaults
+
+    OrdererType: solo
+
+    Addresses:
+        - orderer.banking.com:7050
+
+    BatchTimeout: 2s
+
+    BatchSize:
+
+        MaxMessageCount: 10
+
+        AbsoluteMaxBytes: 99 MB
+
+        PreferredMaxBytes: 512 KB
+
+        
+Application: &ApplicationDefaults
+
+    # Organizations is the list of orgs which are defined as participants on
+    # the application side of the network
+    Organizations:
+
+Profiles:
+
+    TwoOrgOrdererGenesis:
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+        Consortiums:
+            SampleBankConsortium:
+                Organizations:
+                    - *axisBank
+                    - *yesBank
+    TwoOrgChannel:
+        Consortium: SampleBankConsortium
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *axisBank
+                - *yesBank

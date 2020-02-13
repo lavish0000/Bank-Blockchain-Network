@@ -1,0 +1,48 @@
+                                             commands
+
+create channel artifacts :
+
+channel.tx :
+"./../bin/configtxgen -profile TwoOrgChannel -outputCreateChannelTx ./config/channel.tx -channelID bankchannel"
+
+genesis.block
+"../bin/configtxgen -profile TwoOrgOrdererGenesis -outputBlock ./config/genesis.block"
+
+
+create containers : 
+
+"docker-compose -f docker-compose.yml up -d ca_axis ca_yes orderer.banking.com peer0.axis.com peer1.axis.com peer2.axis.com peer0.yes.com peer1.yes.com peer2.yes.com"
+
+
+create channel in peer0  Axis :
+
+"docker exec -e "CORE_PEER_LOCALMSPID=AxisMSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@axis.com/msp" peer0.axis.com peer channel create -o orderer.banking.com:7050 -c bankchannel -f /etc/hyperledger/configtx/channel.tx"
+
+
+join channel with peer0 Axis :
+
+"docker exec -e "CORE_PEER_LOCALMSPID=AxisMSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@axis.com/msp" peer0.axis.com peer channel join -b bankchannel.block"
+
+
+fetch channel in peer0 yes :
+
+"docker exec -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@yes.com/msp" peer0.yes.com peer channel fetch config -o orderer.banking.com:7050 -c bankchannel"
+
+
+join channel with peer0 yes :
+
+"docker exec -e "CORE_PEER_LOCALMSPID=YesMSP" -e "CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp/users/Admin@yes.com/msp" peer0.yes.com peer channel join -b bankchannel_config.block"
+
+
+install chaincode in peer0 axis : 
+
+"docker exec -e "CORE_PEER_LOCALMSPID=AxisMSP" peer0.axis.com peer chaincode install -n democc -v v1 -p chaincode/chaincode_example02/node -l node"
+
+
+instantiate chaincode in peer0 axis : 
+
+"docker exec -e "CORE_PEER_LOCALMSPID=AxisMSP" peer0.axis.com peer chaincode instantiate -o orderer.banking.com:7050 -C bankchannel -n democc -l node -v v1 -c '{"Args":["init","a", "100", "b","200"]}' -P "OR('AxisMSP.peer')""
+
+
+
+
