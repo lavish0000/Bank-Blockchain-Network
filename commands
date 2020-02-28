@@ -43,6 +43,10 @@ instantiate chaincode in peer0 axis :
 
 "docker exec -e "CORE_PEER_LOCALMSPID=AxisMSP" peer0.axis.com peer chaincode instantiate -o orderer.banking.com:7050 -C bankchannel -n democc -l node -v v1 -c '{"Args":["init","a", "100", "b","200"]}' -P "OR('AxisMSP.peer')""
 
+upgrade chaincode : 
+
+"docker exec -e "CORE_PEER_LOCALMSPID=YesMSP" peer0.yes.com peer chaincode upgrade -o orderer.banking.com:7050 -C bankchannel -n democc -l node -v v2.4 -c '{"Args":["init","a", "100", "b","200"]}' -P "OR('YesMSP.peer')""
+
 
 
 

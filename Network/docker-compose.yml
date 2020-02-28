@@ -21,6 +21,10 @@ services:
     command: sh -c 'fabric-ca-server start -b admin:adminpw'
     volumes:
       - ./crypto-config/peerOrganizations/axis.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    extra_hosts:
+      - "peer0.yes.com:192.168.1.66"
+      - "peer1.yes.com:192.168.1.66"
+      - "peer2.yes.com:192.168.1.66"
     container_name: caPeerAxis
     networks:
       - demoNetwork
@@ -63,6 +67,10 @@ services:
         - ./config/:/etc/hyperledger/configtx
         - ./crypto-config/ordererOrganizations/banking.com/orderers/orderer.banking.com/:/etc/hyperledger/msp/orderer
         - ./crypto-config/ordererOrganizations/banking.com:/etc/hyperledger/msp/certs
+    extra_hosts:
+      - "peer0.yes.com:192.168.1.66"
+      - "peer1.yes.com:192.168.1.66"
+      - "peer2.yes.com:192.168.1.66"
     networks:
       - demoNetwork
 
@@ -136,11 +144,16 @@ services:
       - 8053:8053
     volumes:
         - /var/run/:/host/var/run/
-        - ./crypto-config/peerOrganizations/axis.com/users/Admin@axis.com/msp:/etc/hyperledger/msp/peer
+        - ./crypto-config/peerOrganizations/axis.com/users/Admin@axis.com/msp:/etc/hyperledger/msp/user
+        - ./crypto-config/peerOrganizations/axis.com/peers/peer1.axis.com/msp:/etc/hyperledger/msp/peer
         - ./crypto-config/peerOrganizations/axis.com/peers/peer1.axis.com/tls:/etc/hyperledger/tls/peer
         - ./crypto-config/peerOrganizations/axis.com/users:/etc/hyperledger/msp/users
         - ./config:/etc/hyperledger/configtx
         - ./../chaincode:/opt/gopath/src/github.com/hyperledger/fabric/chaincode
+    extra_hosts:
+      - "peer0.yes.com:192.168.1.66"
+      - "peer1.yes.com:192.168.1.66"
+      - "peer2.yes.com:192.168.1.66"
     networks:
       - demoNetwork
   
@@ -178,6 +191,10 @@ services:
         - ./crypto-config/peerOrganizations/axis.com/users:/etc/hyperledger/msp/users
         - ./../chaincode:/opt/gopath/src/github.com/hyperledger/fabric/chaincode
         - ./config:/etc/hyperledger/configtx
+    extra_hosts:
+      - "peer0.yes.com:192.168.1.66"
+      - "peer1.yes.com:192.168.1.66"
+      - "peer2.yes.com:192.168.1.66"
     networks:
       - demoNetwork
 
@@ -205,7 +222,7 @@ services:
     command: peer node start
     # command: peer node start --peer-chaincodedev=true
     ports:
-      - 10051:7051
+      - 10051:10051
       - 10053:10053
     volumes:
         - /var/run/:/host/var/run/
@@ -275,5 +292,50 @@ services:
         - ./crypto-config/peerOrganizations/yes.com/peers/peer2.yes.com/msp:/etc/hyperledger/msp/peer
         - ./crypto-config/peerOrganizations/yes.com/users:/etc/hyperledger/msp/users
         - ./config:/etc/hyperledger/configtx
+    networks:
+      - demoNetwork
+  
+  couchdb.axis.peer0:
+    container_name: couchdb.axis.peer0
+    image: hyperledger/fabric-couchdb
+    # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
+    # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
+    # for example map it to utilize Fauxton User Interface in dev environments.
+    ports:
+      - "5984:5984"
+    networks:
+      - demoNetwork
+
+  couchdb.axis.peer1:
+    container_name: couchdb.axis.peer1
+    image: hyperledger/fabric-couchdb
+    # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
+    # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
+    # for example map it to utilize Fauxton User Interface in dev environments.
+    ports:
+      - "5985:5985"
+    networks:
+      - demoNetwork
+
+  couchdb.axis.peer2:
+    container_name: couchdb.axis.peer2
+    image: hyperledger/fabric-couchdb
+    # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
+    # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
+    # for example map it to utilize Fauxton User Interface in dev environments.
+    ports:
+      - "5986:5986"
     networks:
       - demoNetwork
